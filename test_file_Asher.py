@@ -17,3 +17,10 @@ data_frame = pd.DataFrame(
 
 )
 print(data_frame)
+
+
+df = pd.read_excel (r'C:\Users\ramen\Downloads\InternshipData.xlsx')
+print(df)
+
+electricity = pd.read_excel (r'C:\Users\ramen\Downloads\eia8602019\1___Utility_Y2019.xlsx')
+print(electricity)
