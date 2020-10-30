@@ -1,24 +1,22 @@
 from urllib.request import urlretrieve as retrieve
-url = 'https://www.eia.gov/electricity/data/eia860/xls/eia8602019.zip'
+import zipfile36 as zipfile
 
-retrieve(url, 'data')
+#download zip from website
+def get_zip(url,zip_file_name):
+    retrieve(url, zip_file_name)
 
-'''
-url = 'https://www.eia.gov/electricity/data/eia860/xls/eia8602019.zip'
+#extract zip
+def extract_zip(zip_to_be_extracted, file_name):
+    with zipfile.ZipFile(zip_to_be_extracted, 'r') as zip_ref:
+        zip_ref.extractall(file_name)
 
-def download_eia_data(eia_csv_url):
-    response = request.urlopen(eia_csv_url)
-    csv_data = response.read()
-    csv_data_str = str(csv_data)
-    print(csv_data_str)
+#download all zip files and extract them
+for year in range(2001,2018):
+    year = str(year)
+    looped_url = f'https://www.eia.gov/electricity/data/eia860/archive/xls/eia860{year}.zip'
+    zip_name = year
+    file_name = f'unzipped_{year}'
+    get_zip(looped_url, zip_name)
+    extract_zip(zip_name, file_name)
 
-download_eia_data(url)
 
-
-r = requests.get(url, allow_redirects=True)
-print(r.headers.get('content-type'))
-
-open('2019_data', 'wb').write(r.content)
-
-print('hello')
-'''
