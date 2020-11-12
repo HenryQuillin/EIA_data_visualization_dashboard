@@ -28,18 +28,18 @@ class GetData(object):
             retrieve(looped_url, f'{zip_name}_{year}')
 
     # extract zip
-    def extract_zip(self, start_year, end_year, zip_name, file_name):
+    def extract_zip(self, start_year, end_year, zip_name):
         for year in range(start_year, end_year):
             year = str(year)
             with zipfile.ZipFile(f'{zip_name}_{year}', 'r') as zip_ref:
-                zip_ref.extractall(f'{file_name}_{year}')
+                zip_ref.extractall(f'{zip_name}_{year}')
 
-    def get_data(self, page_url): 
-        pass
+    def get_data(self, start_year, end_year, zip_name): 
+        self.get_zip(start_year, end_year, zip_name)
+        self.extract_zip(start_year, end_year, zip_name)
+d = GetData() 
+d.get_data(2015,2017,'EIA_data')
 
-d = GetData()
-#d.get_zip(2015,2018, 'testing')
-d.extract_zip(2015,2018, 'testing','testing_unzipped')
 '''
 Initialize with page_url 
 Get zip method that uses page url and year 
