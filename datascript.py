@@ -1,7 +1,7 @@
 from urllib.request import urlretrieve as retrieve
 import zipfile36 as zipfile
 import pandas as pd
-i
+
 
 
 #download zip from website
