@@ -3,23 +3,15 @@ from urllib.request import urlretrieve as retrieve
 import zipfile
 # import pandas as pd
 # import numpy as np
-# import os
+import os
 # import shutil
 
 class GetData(object):
     def __init__(self, page_url='https://www.eia.gov/electricity/data/eia860/'):
         self.page_url = page_url
         self.eia860_location = 'archive/xls/eia860'
-    '''
-    def loop_url(start_year, end_year):
-        for year in range(start_year, end_year):
-            year = str(year)
-            looped_url = f'{self.page_url}{self.eia860_location}{year}.zip'
-            zip_name = year
-            file_name = f'unzipped_{year}'
-            get_zip(looped_url, zip_name)
+        self.cwd = os.getcwd()
 
-    '''
     # download zip from website
     def get_zip(self, start_year, end_year, zip_name):
         for year in range(start_year, end_year):
@@ -32,13 +24,14 @@ class GetData(object):
         for year in range(start_year, end_year):
             year = str(year)
             with zipfile.ZipFile(f'{zip_name}_{year}', 'r') as zip_ref:
-                zip_ref.extractall(f'{zip_name}_{year}')
+                zip_ref.extractall(f'{zip_name}_{year}_unzipped')
 
+    # download zip and extract zip 
     def get_data(self, start_year, end_year, zip_name): 
         self.get_zip(start_year, end_year, zip_name)
         self.extract_zip(start_year, end_year, zip_name)
-d = GetData() 
-d.get_data(2015,2017,'EIA_data')
+d = GetData()
+d.get_data(2014,2015,'EIA_data')
 
 '''
 Initialize with page_url 
