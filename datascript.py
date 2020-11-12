@@ -23,8 +23,8 @@ def download_data(start_year, end_year):
         get_zip(looped_url, zip_name)
         extract_zip(zip_name, file_name)
 
-download_data(2002, 2019)
-plant_df = pd.read_excel (r'C:\Users\henry\Desktop\Projects\internship_repo\unzipped_2018\2___Plant_Y2018.xlsx')
-layout_df = pd.read_excel (r'C:\Users\henry\Desktop\Projects\internship_repo\unzipped_2018\LayoutY2018.xlsx')
-print(plant_df.head(5))
+#download_data(2002, 2019)
+#plant_df = pd.read_excel (r'C:\Users\henry\Desktop\Projects\internship_repo\unzipped_2018\2___Plant_Y2018.xlsx')
+#layout_df = pd.read_excel (r'C:\Users\henry\Desktop\Projects\internship_repo\unzipped_2018\LayoutY2018.xlsx')
+#print(plant_df.head(5))
 
