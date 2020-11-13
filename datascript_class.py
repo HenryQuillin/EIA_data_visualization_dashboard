@@ -7,10 +7,14 @@ import os
 # import shutil
 
 class GetData(object):
-    def __init__(self, page_url='https://www.eia.gov/electricity/data/eia860/'):
+    def __init__(self, page_url='https://www.eia.gov/electricity/data/eia860/', working_directory=None):
         self.page_url = page_url
         self.eia860_location = 'archive/xls/eia860'
-        self.cwd = os.getcwd()
+        if working_directory is None:
+            self.cwd = os.getcwd()
+        else:
+            self.cwd = working_directory
+
 
     # download zip from website
     def get_zip(self, start_year, end_year, zip_name):
@@ -30,8 +34,12 @@ class GetData(object):
     def get_data(self, start_year, end_year, zip_name): 
         self.get_zip(start_year, end_year, zip_name)
         self.extract_zip(start_year, end_year, zip_name)
-d = GetData()
-d.get_data(2014,2015,'EIA_data')
+
+
+if __name__ == 'main':
+    d = GetData()
+    d.get_data(2014, 2015, 'EIA_data')
+
 
 '''
 Initialize with page_url 
