@@ -1,10 +1,9 @@
 import requests as req
 import zipfile
-import pandas as pd
 
 web = 'https://www.eia.gov/electricity/data/eia860/xls/eia8602019.zip'
 
-class DataGrab(object):
+class DataSnatch(object):
 
     def __init__(self, url, filename, new_file):
         self.url = url
@@ -21,7 +20,7 @@ class DataGrab(object):
     def un_zip(self):
         with zipfile.ZipFile(self.filename, 'r') as zip_ref:
             zip_ref.extractall(self.new_file)
-data = DataGrab(web, 'other_general_data.zip', 'new_zip')
+data = DataSnatch(web, 'other_general_data.zip', 'new_zip')
 data.download()
 data.un_zip()
 
