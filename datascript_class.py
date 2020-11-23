@@ -42,27 +42,23 @@ class GetData(object):
         file_location = self.cwd / f"EIA_data_2017_unzipped/2___Plant_Y{year}.xlsx"
         self.df = pd.read_excel(file_location, skiprows=1)
         self.df = self.df[['Plant Name', 'Latitude', 'Longitude']]
-
         print(self.df.head(3))
 
     def save_data(self, year, file_type='csv'):
-        new_header = self.df.iloc[0]  # grab the first row for the header
-        self.df = self.df[1:]  # take the data less the header row
-        self.df.columns = new_header  # set the header row as the df header
+        # new_header = self.df.iloc[0]  # grab the first row for the header
+        #self.df = self.df[1:]  # take the data less the header row
+        # self.df.columns = new_header  # set the header row as the df header
         #self.df.drop(self.df.columns[[2,4,5,6,7,8][11:]], axis=1)
         if file_type == 'json' or file_type == 'JSON':
             self.df.to_json(self.cwd / f"df_csv/df_{year}.json")
         else:
             self.df.to_csv(self.cwd / f"df_csv/df_{year}.csv")
         print(self.df.head(10))
-        # df[[
 
 
 if __name__ == 'main':
     pass
-d = GetData()
-#d.get_data(2017, 2018, 'EIA_data')
-d.load_data('2017')
-d.save_data('2017', 'csv')
 
+#d = GetData()
+#d.get_zip(2017,2018,'eia')
 # testing 
