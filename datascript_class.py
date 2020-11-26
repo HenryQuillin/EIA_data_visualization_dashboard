@@ -23,7 +23,14 @@ class GetData(object):
         for year in range(start_year, end_year):
             year = str(year)
             looped_url = f'{self.page_url}{self.eia860_location}{year}.zip'
-            retrieve(looped_url, f'{zip_name}_{year}')
+            with req.get(looped_url) as rq:
+                with open(f'{zip_name}_{year}', 'wb') as file:
+                    file.write(rq.content)
+
+            
+            # r = req.get(looped_url, allowredirects=True)
+            # open(f'{zip_name}_{year}', 'wb').write(r.content)
+            # retrieve(looped_url, f'{zip_name}_{year}')
 
     # extract zip
     def extract_zip(self, start_year, end_year, zip_name):
@@ -59,6 +66,7 @@ class GetData(object):
 if __name__ == 'main':
     pass
 
-#d = GetData()
-#d.get_zip(2017,2018,'eia')
+d = GetData()
+d.get_data(2016,2018,'EIA')
+
 # testing 
