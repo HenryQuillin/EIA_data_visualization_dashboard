@@ -16,6 +16,8 @@ class GetData(object):
         else:
             self.cwd = working_directory
         self.df = None
+        self.file_name = 'EIA'
+
 
 
     # download zip from website
@@ -24,7 +26,7 @@ class GetData(object):
             year = str(year)
             looped_url = f'{self.page_url}{self.eia860_location}{year}.zip'
             with req.get(looped_url) as rq:
-                with open(f'{zip_name}_{year}', 'wb') as file:
+                with open(f'data/{zip_name}_{year}', 'wb') as file:
                     file.write(rq.content)
 
             
@@ -34,39 +36,47 @@ class GetData(object):
 
     # extract zip
     def extract_zip(self, start_year, end_year, zip_name):
+        self.file_name = zip_name
         for year in range(start_year, end_year):
             year = str(year)
-            with zipfile.ZipFile(f'{zip_name}_{year}', 'r') as zip_ref:
-                zip_ref.extractall(f'{zip_name}_{year}_unzipped')
+            with zipfile.ZipFile(f'data/{self.file_name}_{year}', 'r') as zip_ref:
+                zip_ref.extractall(f'data/{self.file_name}_{year}_unzipped')
 
     # download zip and extract zip 
-    def get_data(self, start_year, end_year, zip_name): 
-        self.get_zip(start_year, end_year, zip_name)
-        self.extract_zip(start_year, end_year, zip_name)
+    def get_data(self, start_year, end_year, zip_name='EIA'): 
+        self.file_name = zip_name
+        self.get_zip(start_year, end_year, self.file_name)
+        self.extract_zip(start_year, end_year, self.file_name)
 
 
-    def load_data(self, year):
-        file_location = self.cwd / f"EIA_data_2017_unzipped/2___Plant_Y{year}.xlsx"
-        self.df = pd.read_excel(file_location, skiprows=1)
-        self.df = self.df[['Plant Name', 'Latitude', 'Longitude']]
-        print(self.df.head(3))
+    def load_data(self, start_year, end_year):
+        for year in range(start_year, end_year):
+            file_location = self.cwd / 'data' / f"{self.file_name}_{year}_unzipped/2___Plant_Y{year}.xlsx"
+            self.df = pd.read_excel(file_location, skiprows=1)
+            self.df = self.df[['Plant Name', 'Latitude', 'Longitude']]
+            print(self.df.head(3))
 
-    def save_data(self, year, file_type='csv'):
-        # new_header = self.df.iloc[0]  # grab the first row for the header
-        #self.df = self.df[1:]  # take the data less the header row
-        # self.df.columns = new_header  # set the header row as the df header
-        #self.df.drop(self.df.columns[[2,4,5,6,7,8][11:]], axis=1)
-        if file_type == 'json' or file_type == 'JSON':
-            self.df.to_json(self.cwd / f"df_csv/df_{year}.json")
-        else:
-            self.df.to_csv(self.cwd / f"df_csv/df_{year}.csv")
-        print(self.df.head(10))
+    def save_data(self, start_year, end_year, file_type='csv'):
+        for year in range(start_year, end_year):
+            if file_type == 'json' or file_type == 'JSON':
+                self.df.to_json(self.cwd / 'data' f"df_{year}.json")
+            else:
+                self.df.to_csv(self.cwd / 'data' / f"df_{year}.csv")
+
+    def get_data_to_csv(self, start_year, end_year, file_name='EIA', file_type='csv'):
+        d.get_data(start_year,end_year,file_name)
+        d.load_data(start_year,end_year)
+        d.save_data(start_year,end_year,file_type)
+
 
 
 if __name__ == 'main':
     pass
 
 d = GetData()
-d.get_data(2016,2018,'EIA')
+d.get_data_to_csv(2015,2018)
+
+
+
 
 # testing 
