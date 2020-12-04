@@ -54,7 +54,6 @@ class GetData(object):
             file_location = self.cwd / 'data' / f"{self.file_name}_{year}_unzipped/2___Plant_Y{year}.xlsx"
             self.df = pd.read_excel(file_location, skiprows=1)
             self.df = self.df[['Plant Name', 'Latitude', 'Longitude']]
-            print(self.df.head(3))
 
     def save_data(self, start_year, end_year, file_type='csv'):
         for year in range(start_year, end_year):
@@ -64,6 +63,7 @@ class GetData(object):
                 self.df.to_csv(self.cwd / 'data' / f"df_{year}.csv")
 
     def get_data_to_csv(self, start_year, end_year, file_name='EIA', file_type='csv'):
+        os.mkdir(self.cwd / 'data') 
         d.get_data(start_year,end_year,file_name)
         d.load_data(start_year,end_year)
         d.save_data(start_year,end_year,file_type)
@@ -74,7 +74,7 @@ if __name__ == 'main':
     pass
 
 d = GetData()
-d.get_data_to_csv(2015,2018)
+d.get_data_to_csv(2015,2019)
 
 
 
