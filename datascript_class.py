@@ -29,10 +29,6 @@ class GetData(object):
                 with open(f'data/{zip_name}_{year}', 'wb') as file:
                     file.write(rq.content)
 
-            
-            # r = req.get(looped_url, allowredirects=True)
-            # open(f'{zip_name}_{year}', 'wb').write(r.content)
-            # retrieve(looped_url, f'{zip_name}_{year}')
 
     # extract zip
     def extract_zip(self, start_year, end_year, zip_name):
@@ -62,6 +58,7 @@ class GetData(object):
             else:
                 self.df.to_csv(self.cwd / 'data' / f"df_{year}.csv")
 
+    # Puts it all together 
     def get_data_to_csv(self, start_year, end_year, file_name='EIA', file_type='csv'):
         os.mkdir(self.cwd / 'data') 
         d.get_data(start_year,end_year,file_name)
