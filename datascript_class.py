@@ -3,8 +3,10 @@ from urllib.request import urlretrieve as retrieve
 import zipfile
 import pandas as pd
 from pathlib import Path
-# import numpy as np
+import numpy as np
 import os
+import plotly.express as px
+import dash
 # import shutil
 
 class GetData(object):
@@ -49,7 +51,10 @@ class GetData(object):
         for year in range(start_year, end_year):
             file_location = self.cwd / 'data' / f"{self.file_name}_{year}_unzipped/2___Plant_Y{year}.xlsx"
             self.df = pd.read_excel(file_location, skiprows=1)
+
             self.df = self.df[['Plant Name', 'Latitude', 'Longitude']]
+            #self.df = self.df[['Plant Name','Longitude','Latitude']]
+            self.df = self.df.set_index('Plant Name')
 
     def save_data(self, start_year, end_year, file_type='csv'):
         for year in range(start_year, end_year):
@@ -60,7 +65,8 @@ class GetData(object):
 
     # Puts it all together 
     def get_data_to_csv(self, start_year, end_year, file_name='EIA', file_type='csv'):
-        os.mkdir(self.cwd / 'data') 
+        if os.path.isfile(self.cwd / 'data') == True: 
+            os.mkdir(self.cwd / 'data') 
         d.get_data(start_year,end_year,file_name)
         d.load_data(start_year,end_year)
         d.save_data(start_year,end_year,file_type)
@@ -71,9 +77,34 @@ if __name__ == 'main':
     pass
 
 d = GetData()
-d.get_data_to_csv(2015,2019)
+d.get_data_to_csv(2018,2019, file_type='csv')
 
+'''
+plotly_data = pd.read_csv(d.cwd / 'data' / 'df_2018.csv')
 
+fig = px.scatter_mapbox(plotly_data, lat="Latitude", lon="Longitude", hover_name="Plant Name", color_discrete_sequence=["fuchsia"], zoom=3, height=300)
+fig.update_layout(mapbox_style="open-street-map")
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+ '''
+'''
+us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
 
-
+fig = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
+                        color_discrete_sequence=["fuchsia"], zoom=3, height=300)
+fig.update_layout(
+    mapbox_style="white-bg",
+    mapbox_layers=[
+        {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "sourceattribution": "United States Geological Survey",
+            "source": [
+                "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}"
+            ]
+        }
+      ])
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+'''
 # testing 
