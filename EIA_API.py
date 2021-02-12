@@ -5,6 +5,7 @@ import numpy as np
 from datetime import date
 import matplotlib.ticker as ticker
 
+
 # API Key from EIA
 api_key = '3c109e8bc5897c4015d86e77e699ebc6'
 
@@ -26,8 +27,7 @@ endDate = '2021-01-01'
 
 # Pull in data via EIA API
 for i in range(len(PADD_KEY)):
-    url = 'http://api.eia.gov/series/?api_key=' + api_key +
-          '&series_id=' + PADD_KEY[i]
+    url = 'http://api.eia.gov/series/?api_key=' + api_key + '&series_id=' + PADD_KEY[i]
     r = requests.get(url)
     json_data = r.json()
     
@@ -85,19 +85,17 @@ for padd in list(colors.keys()):
 # Adding Labels
 plot.text(x = crude.index[1], 
           y = int(crude.max().max())+1300, 
-          s = "Crude Consumption by PADD (thousand barrels per
-               day)", 
+          s = "Crude Consumption by PADD (thousand barrels per day)", 
           fontsize = 23, 
           weight = 'bold', 
           alpha = .75)
 plot.text(x = crude.index[1], 
           y = int(crude.max().max())+900, 
-          s = "Crude consumption by refineries and blenders is a  
-          proxy for crude demand in each region", 
+          s = "Crude consumption by refineries and blenders is a proxy for crude demand in each region", 
           fontsize = 16, 
           alpha = .75)
 plot.text(x = crude.index[1], 
           y = -1000,
-          s = 'Source: Energy Information Administration
-          www.eia.gov', 
+          s = 'Source: Energy Information Administration www.eia.gov', 
           fontsize = 10)
+plot.show()
