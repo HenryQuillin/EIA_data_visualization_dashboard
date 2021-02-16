@@ -1,5 +1,7 @@
 import eia
 import pandas as pd
+import plotly.express as px
+
 
 def retrieve_time_series(api, series_ID):
     """
@@ -17,9 +19,14 @@ def main():
     api = eia.API(api_key)
     #Declare desired series ID
     series_ID='TOTAL.SOT5PUS.A'
-    df=retrieve_time_series(api, series_ID)
+    global df
+    df = retrieve_time_series(api, series_ID)
     #Print the returned dataframe df
-    print(df)
+
 
 if __name__== "__main__":
     main()
+print(df)
+print(list(df.columns))
+#fig = px.line(df, x="Period", y="Value", title='Net generation')
+#fig.show()

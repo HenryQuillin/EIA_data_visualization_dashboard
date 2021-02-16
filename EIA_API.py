@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import date
 import matplotlib.ticker as ticker
+import plotly.express as px
 
 
 # API Key from EIA
@@ -46,56 +47,19 @@ for i in range(len(PADD_KEY)):
 
 
 # Combine all the data into one dataframe
-crude = pd.concat(final_data, axis=1)
+final_df = pd.concat(final_data, axis=1)
 
 
 # Create date as datetype datatype
-crude['Year'] = crude.index.astype(str).str[:4]
-crude['Month'] = crude.index.astype(str).str[4:]
-crude['Day'] = 1
-crude['Date'] = pd.to_datetime(crude[['Year','Month','Day']])
-crude.set_index('Date',drop=True,inplace=True)
-crude.sort_index(inplace=True)
-crude = crude[startDate:endDate]
-crude = crude.iloc[:,:5]
+final_df['Year'] = final_df.index.astype(str).str[:4]
+final_df['Month'] = final_df.index.astype(str).str[4:]
+final_df['Day'] = 1
+final_df['Date'] = pd.to_datetime(final_df[['Year','Month','Day']])
+final_df.set_index('Date',drop=True,inplace=True)
+final_df.sort_index(inplace=True)
+final_df = final_df[startDate:endDate]
+final_df = final_df.iloc[:,:5]
 
 
-
-# Generating Colours and Style
-colors = {'PADD 1':'#045275', 
-          'PADD 2':'#089099', 
-          'PADD 3':'#7CCBA2', 
-          'PADD 4':'#7C1D6F', 
-          'PADD 5':'#DC3977'}
-plt.style.use('fivethirtyeight')
-# Creating the Visualization
-plot = crude.plot(figsize=(12,8), 
-                  color=list(colors.values()), 
-                  linewidth=5, 
-                  legend=False)
-plot.yaxis.set_major_formatter(ticker.StrMethodFormatter('{x:,.0f}'))
-plot.grid(color='#d4d4d4')
-plot.set_xlabel('Date')
-plot.set_ylabel('Crude Inventory Levels (KBD)')
-
-# Assigning Colour
-for padd in list(colors.keys()):
-    plot.text(x = crude.index[-1], y = crude[padd].max(), color = 
-    colors[padd], s = padd, weight = 'bold')
-# Adding Labels
-plot.text(x = crude.index[1], 
-          y = int(crude.max().max())+1300, 
-          s = "Crude Consumption by PADD (thousand barrels per day)", 
-          fontsize = 23, 
-          weight = 'bold', 
-          alpha = .75)
-plot.text(x = crude.index[1], 
-          y = int(crude.max().max())+900, 
-          s = "Crude consumption by refineries and blenders is a proxy for crude demand in each region", 
-          fontsize = 16, 
-          alpha = .75)
-plot.text(x = crude.index[1], 
-          y = -1000,
-          s = 'Source: Energy Information Administration www.eia.gov', 
-          fontsize = 10)
-plot.show()
+fig = px.line(final_df, title='Net generation')
+fig.show()
