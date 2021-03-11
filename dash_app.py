@@ -8,21 +8,28 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from pathlib import Path
+#create plant dataframe 
+plant_df = pd.read_excel('C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data\\EIA_2018_unzipped\\2___Plant_Y2018.xlsx', skiprows=1)
+plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude', 'Transmission or Distribution System Owner']]
+#print(plant_df.head())
+
+#create generator dataframe
+gen_df = pd.read_excel('C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data\\EIA_2018_unzipped\\3_1_Generator_Y2018.xlsx', skiprows=1)
+gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name', 'Technology', 'Prime Mover', 'Operating Year',]]
+#print(gen_df.head())
+
+#merge both dataframes on 'plant code' 
+merged_df = pd.merge(gen_df, plant_df)
+print('---------------')
+#print(merged_df.head())
 
 app = dash.Dash(__name__)
 
-
-df = pd.read_csv(Path(os.getcwd()) / 'data' / "df_2018.csv")
-
-df.reset_index(inplace=True)
-print(df[:5])
-
-
 # App layout
 fig = go.Figure(data=go.Scattergeo(
-    lon=df['Longitude'],
-    lat=df['Latitude'],
-    text=df['Plant Name'],
+    lon=merged_df['Longitude'],
+    lat=merged_df['Latitude'],
+    text=merged_df['Plant Name'],
     mode='markers',
 ))
 fig.update_layout(height=800,width=1300,margin={"r":0,"t":0,"l":0,"b":0})

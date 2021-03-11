@@ -14,7 +14,7 @@ api_key = '3c109e8bc5897c4015d86e77e699ebc6'
 
 # column labels 
 PADD_NAMES = ['NATURAL GAS','COAL','PETROLIUM']
-# Enter all your Series IDs here separated by commas
+# Series IDs 
 PADD_KEY = ['EMISS.CO2-TOTV-TT-NG-US.A','EMISS.CO2-TOTV-TT-CO-US.A','EMISS.CO2-TOTV-TT-PE-US.A']
 #list to concat into a pandas dataframe
 final_data = []
@@ -40,6 +40,7 @@ for i in range(len(PADD_KEY)):
 
 # Combine all the data into one dataframe
 final_df = pd.concat(final_data, axis=1)
+# format years correctly  
 final_df = final_df.sort_index(ascending=True)
 
 
