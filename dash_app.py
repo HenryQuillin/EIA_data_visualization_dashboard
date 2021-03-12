@@ -12,20 +12,26 @@ import plotly.graph_objects as go
 
 data = 'C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data'
 
-#create plant dataframe 
-plant_df = pd.read_excel(data + '\\2___Plant_Y2019.xlsx', skiprows=1, nrows=45)
-plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude', 'Transmission or Distribution System Owner']]
-print(plant_df.head(2))
+all_years = pd.DataFrame()
+years = range(2010,2021)
+for year in years:
+    #create plant dataframe 
+    plant_df = pd.read_excel(data + f'\\2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
+    plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude', 'Transmission or Distribution System Owner']]
+    print(plant_df.head(2))
 
-#create generator dataframe
-gen_df = pd.read_excel(data + '\\3_1_Generator_Y2019.xlsx', skiprows=1, nrows=25)
-gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name', 'Technology', 'Prime Mover', 'Operating Year',]]
-#print(gen_df.head(2))
+    #create generator dataframe
+    gen_df = pd.read_excel(data + f'\\3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
+    gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
+    print(gen_df.head(2))
 
-#merge both dataframes on 'plant code' 
-merged_df = pd.merge(gen_df, plant_df)
-print('---------------')
-#print(merged_df.head())
+    #merge both dataframes on 'plant code' 
+    merged_df = pd.merge(gen_df, plant_df)
+    print('-------MERGED DF--------')
+    print(merged_df.head())
+
+    merged_df = merged_df.assign(year=year)
+    all_years = pd.concat([all_years, merged_df], ignore_index=True)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
