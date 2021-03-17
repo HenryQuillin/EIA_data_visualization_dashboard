@@ -13,31 +13,31 @@ import plotly.graph_objects as go
 data = 'C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data'
 
 all_years = pd.DataFrame()
-years = range(2010,2021)
+years = range(2019,2020)
 for year in years:
     #create plant dataframe 
     plant_df = pd.read_excel(data + f'\\2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
     plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude', 'Transmission or Distribution System Owner']]
-    print(plant_df.head(2))
 
     #create generator dataframe
     gen_df = pd.read_excel(data + f'\\3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
     gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
-    print(gen_df.head(2))
 
     #merge both dataframes on 'plant code' 
     merged_df = pd.merge(gen_df, plant_df)
     print('-------MERGED DF--------')
-    print(merged_df.head())
+    print(merged_df.head(2))
 
     merged_df = merged_df.assign(year=year)
     all_years = pd.concat([all_years, merged_df], ignore_index=True)
+    print('All years------------------')
+    print(all_years.head(3))
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
-# App layout
 
 
+# ------------APP LAYOUT------------------------------
 app.layout = dbc.Container([
 
     dbc.Row([
@@ -53,13 +53,25 @@ app.layout = dbc.Container([
                                     for x in gen_df['Technology'].unique()],
                          ),
             dcc.Graph(id='line-fig', figure={})
-        ], width={'size':5})
-        
+        ]),
+        dbc.Col([
+            dcc.Dropdown(id='my-dpdn2', multi=True, value=['PFE','BNTX'],
+                         options=[{'label':x, 'value':x}
+                                  for x in sorted(df['Symbols'].unique())],
+                         ),
+            dcc.Graph(id='line-fig2', figure={})
+        ])
     ]),
-    dbc.Row([
 
+    dbc.Row([
     ])
 ])
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
+
 
 # fig = go.Figure(data=go.Scattergeo(
 #     lon=merged_df['Longitude'],
@@ -73,8 +85,13 @@ app.layout = dbc.Container([
 
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+
+
+
+
+
+
+
 
 
 
