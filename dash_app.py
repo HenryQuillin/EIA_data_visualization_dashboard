@@ -64,7 +64,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H3('Bubble Map', style={'textDecoration': 'underline'}, className='text-center'), 
-            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3 text-center'),
+            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3'),
             dcc.Graph(id='bubble_chart', figure={})
         ], #width={'size':5, 'offset':0})
         xs=12, sm=12, md=12, lg=10, xl=10),
