@@ -2,22 +2,20 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input
-from dash_html_components.Figure import Figure
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import pandas as pd
 import datetime
-import plotly.express
 import plotly.graph_objects as go
 
 data = 'C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data'
 
-all_years = pd.DataFrame()
+final_df = pd.DataFrame()
 years = range(2019,2020)
 for year in years:
     #create plant dataframe 
     plant_df = pd.read_excel(data + f'\\2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
-    plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude', 'Transmission or Distribution System Owner']]
+    plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude']]
 
     #create generator dataframe
     gen_df = pd.read_excel(data + f'\\3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
@@ -26,50 +24,55 @@ for year in years:
     #merge both dataframes on 'plant code' 
     merged_df = pd.merge(gen_df, plant_df)
     print('-------MERGED DF--------')
-    print(merged_df.head(2))
 
     merged_df = merged_df.assign(year=year)
-    all_years = pd.concat([all_years, merged_df], ignore_index=True)
-    print('All years------------------')
-    print(all_years.head(3))
+    final_df = pd.concat([final_df, merged_df], ignore_index=True)
+    print('---------------All years------------------')
+print('----------LOADED DATAFRAMES----------------')
+print(final_df.head(3))
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
-
-
-
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
+print('---------------CREATING LAYOUT-------------------')
 # ------------APP LAYOUT------------------------------
 app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col(html.H1("Energy Data Dashboard",
                         className='text-center text-primary mb-4'),
-                width=12)
+                )
     ]),
 
     dbc.Row([
         dbc.Col([
-            dcc.Dropdown(id='dpdn1', multi=False, value='Wind', 
-                                    options=[{'label':x, 'value':x}
-                                    for x in gen_df['Technology'].unique()],
+            dcc.Dropdown(id='dpdn1', multi=True, value=['WT','IC'], options=[{'label':x, 'value':x}
+                                    for x in final_df['Prime Mover'].unique()],
                          ),
             dcc.Graph(id='line-fig', figure={})
-        ]),
+        ], #width={'size':5, 'offset':0},
+        xs=12, sm=12, md=12, lg=5, xl=5),
         dbc.Col([
-            dcc.Dropdown(id='my-dpdn2', multi=True, value=['PFE','BNTX'],
-                         options=[{'label':x, 'value':x}
-                                  for x in sorted(df['Symbols'].unique())],
+            dcc.Dropdown(id='my-dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x}
+                                  for x in sorted(final_df['Technology'].unique())],
                          ),
             dcc.Graph(id='line-fig2', figure={})
-        ])
-    ]),
+        ], #width={'size':5, 'offset':0} 
+        xs=12, sm=12, md=12, lg=5, xl=5),
+    ],justify='around'),
 
     dbc.Row([
-    ])
-])
+        dbc.Col([
+            html.H3('Bubble Map', style={'textDecoration': 'underline'}), 
+            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3'),
+            dcc.Graph(id='bubble_chart', figure={})
+        ], #width={'size':5, 'offset':0})
+        xs=12, sm=12, md=12, lg=5, xl=5),
+    ], justify='around')
+],fluid=True)
 
+print('---------------CREATED LAYOUT-------------------')
+print('---------------RAN SERVER-------------------')
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+app.run_server(debug=True)
 
 
 
