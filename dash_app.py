@@ -7,18 +7,20 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import datetime
 import plotly.graph_objects as go
+import os
+from pathlib import Path
 
-data = 'C:\\Users\\henry\\Desktop\\Projects\\internship_repo\\data'
+data = str(Path(os.getcwd()+'/data'))
 
 final_df = pd.DataFrame()
 years = range(2019,2020)
 for year in years:
     #create plant dataframe 
-    plant_df = pd.read_excel(data + f'\\2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
+    plant_df = pd.read_excel(data + f'/2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
     plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude']]
 
     #create generator dataframe
-    gen_df = pd.read_excel(data + f'\\3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
+    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
     gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
 
     #merge both dataframes on 'plant code' 
@@ -61,11 +63,11 @@ app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col([
-            html.H3('Bubble Map', style={'textDecoration': 'underline'}), 
-            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3'),
+            html.H3('Bubble Map', style={'textDecoration': 'underline'}, className='text-center'), 
+            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3 text-center'),
             dcc.Graph(id='bubble_chart', figure={})
         ], #width={'size':5, 'offset':0})
-        xs=12, sm=12, md=12, lg=5, xl=5),
+        xs=12, sm=12, md=12, lg=10, xl=10),
     ], justify='around')
 ],fluid=True)
 
@@ -73,7 +75,7 @@ print('---------------CREATED LAYOUT-------------------')
 print('---------------RAN SERVER-------------------')
 
 app.run_server(debug=True)
-
+'''
 
 
 # fig = go.Figure(data=go.Scattergeo(
@@ -98,7 +100,7 @@ app.run_server(debug=True)
 
 
 
-'''
+
 app = dash.Dash(__name__, external_stylesheets=dbc.themes.DARKLY,
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
@@ -166,5 +168,4 @@ app.layout = html.Div([
 fig.show()
 
 # ------------------------------------------------------------------------------
-
 '''

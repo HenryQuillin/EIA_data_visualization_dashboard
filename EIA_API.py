@@ -1,10 +1,11 @@
 import pandas as pd
 import requests
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 from datetime import date
-import matplotlib.ticker as ticker
-import plotly.express as px
+#import matplotlib.ticker as ticker
+#import plotly.express as px
+import os
 
 
 # API Key from EIA
@@ -46,5 +47,5 @@ final_df = final_df.sort_index(ascending=True)
 
 
 print(final_df.head())
-fig = px.line(final_df,title='Total carbon dioxide emissions in the United States (million metric tons CO2)')
-fig.show()
+#fig = px.line(final_df,title='Total carbon dioxide emissions in the United States (million metric tons CO2)')
+#fig.show()
