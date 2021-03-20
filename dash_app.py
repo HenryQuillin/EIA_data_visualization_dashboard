@@ -12,44 +12,41 @@ from pathlib import Path
 
 data = str(Path(os.getcwd()+'/data'))
 
-final_df = pd.DataFrame()
-years = range(2019,2020)
+master_df = pd.DataFrame()
+tc_by_pm_df = pd.DataFrame()
+years = range(2014,2020)
 for year in years:
     #create plant dataframe 
-    plant_df = pd.read_excel(data + f'/2___Plant_Y{year}.xlsx', skiprows=1, nrows=25)
+    plant_df = pd.read_excel(data + f'/2___Plant_Y{year}.xlsx', skiprows=1)
     plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude']]
 
     #create generator dataframe
-    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
-    gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
+    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1)
+    gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Prime Mover', 'Technology', 'Operating Year','Nameplate Capacity (MW)']]
 
     #merge both dataframes on 'plant code' 
     merged_df = pd.merge(gen_df, plant_df)
     print('-------MERGED DF--------')
-
     merged_df = merged_df.assign(year=year)
-    final_df = pd.concat([final_df, merged_df], ignore_index=True)
-    print('---------------All years------------------')
+    dff = merged_df[['year','Prime Mover','Nameplate Capacity (MW)']].groupby('Prime Mover', as_index=False)['Nameplate Capacity (MW)'].sum()
+    dff = dff.assign(year=year)
+    tc_by_pm_df = pd.concat([tc_by_pm_df, dff], ignore_index=True)
+    master_df = pd.concat([master_df, merged_df], ignore_index=True)
+
+# Create total capacity by prime movers dataframe 
+# tc_by_pm_df = pd.DataFrame()
+# dff = master_df[['year','Prime Mover','Nameplate Capacity (MW)']].groupby('Prime Mover', as_index=False)['Nameplate Capacity (MW)'].sum()
+# for year in years:
+#     dff = dff.assign(year=year)
+#     tc_by_pm_df = pd.concat([tc_by_pm_df, dff], ignore_index=True)
+
+tc_by_pm_df.rename(columns = {'Nameplate Capacity (MW)':'Total Nameplate Capacity'}, inplace = True) 
+
 print('----------LOADED DATAFRAMES----------------')
 
-# Add total capacity of prime movers 
-total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']].groupby('Prime Mover', as_index=False)['Nameplate Capacity (MW)'].sum()
-for year in years:
-    total_capacity_df = total_capacity_df.assign(year=year)
-    total_capacity_df.rename(columns = {'Nameplate Capacity (MW)':'Total Nameplate Capacity'}, inplace = True) 
-print(total_capacity_df)
-
-exit()
-print(final_df.head(3))
-# Create df with total_capacity 
-total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']]
-for x in total_capacity_df['Prime Mover'].unique():
-    print(x)
-    total = total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Nameplate Capacity (MW)'].sum()
-    total_capacity_df = total_capacity_df.assign(TotalCapacity=total)
-#total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Total Capacity'] = total
-#print(total_capacity_df.head(15))
-
+print(dff.shape)
+print(tc_by_pm_df)
+print(tc_by_pm_df.shape)
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
@@ -66,16 +63,14 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H3("Total Nameplate Capacity by Prime Mover", className='text-center text-primary mb-4'),
-            dcc.Dropdown(id='dpdn1', multi=True, value=['WT','IC'], options=[{'label':x, 'value':x}
-                                    for x in final_df['Prime Mover'].unique()],
+            dcc.Dropdown(id='dpdn1', multi=True, value=['WT','CT','CA','HY'], options=[{'label':x, 'value':x} for x in master_df['Prime Mover'].unique()],
                          ),
             dcc.Graph(id='line-fig', figure={})
         ], #width={'size':5, 'offset':0},
         xs=12, sm=12, md=12, lg=5, xl=5),
         dbc.Col([
             html.H3("Total Nameplate Capacity by Technology", className='text-center text-primary mb-4'),
-            dcc.Dropdown(id='dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x}
-                                  for x in sorted(final_df['Technology'].unique())],
+            dcc.Dropdown(id='dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x} for x in sorted(master_df['Technology'].unique())],
                          ),
             dcc.Graph(id='line-fig2', figure={})
         ], #width={'size':5, 'offset':0} 
@@ -85,7 +80,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H3('Bubble Map', style={'textDecoration': 'underline'}, className='text-center'), 
-            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(final_df['Prime Mover'].unique())],labelClassName='mr-3'),
+            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(master_df['Prime Mover'].unique())],labelClassName='mr-3'),
             dcc.Graph(id='bubble_chart', figure={})
         ], #width={'size':5, 'offset':0})
         xs=12, sm=12, md=12, lg=10, xl=10),
@@ -99,39 +94,42 @@ print('---------------CREATED LAYOUT-------------------')
     [Input('dpdn1','value')]
 )
 def update_fig1(dpdn_val):
-    dff = final_df[final_df['Prime Mover'].isin(dpdn_val)]
-    line_fig = px.line(dff, x='year', y='Nameplate Capacity (MW)')
+    dff = tc_by_pm_df[tc_by_pm_df['Prime Mover'].isin(dpdn_val)]
+    line_fig = px.line(dff, x='year', y='Total Nameplate Capacity', color='Prime Mover')
     return [line_fig]
-
+'''
+@app.callback(
+    [Output('line-fig2','figure')],
+    [Input('dpdn2','value')]
+)
+def update_fig2(dpdn_val):
+    t_by_pm_df = pd.DataFrame()
+    dff = master_df[['year','Prime Mover','Technology']].groupby('Technology', as_index=False)['Nameplate Capacity (MW)'].sum()
+    for year in years:
+        dff = dff.assign(year=year)
+        t_by_pm_df = pd.concat([t_by_pm_df, dff], ignore_index=True)
+    t_by_pm_df.rename(columns = {'Nameplate Capacity (MW)':'Total Nameplate Capacity'}, inplace = True) 
+    dff2 = t_by_pm_df[t_by_pm_df['Technology'].isin(dpdn_val)]
+    line_fig = px.line(dff2, x='year', y='Total Nameplate Capacity', color='Technology')
+    return [line_fig]
+'''
+# def update_fig2(dpdn_val):
+#     dff = tc_by_pm_df[tc_by_pm_df['Prime Mover'].isin(dpdn_val)]
+#     line_fig = px.line(dff, x='year', y='Total Nameplate Capacity', color='Prime Mover')
+#     return [line_fig]
 
 
 
 print('---------------RAN SERVER-------------------')
-
-app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(debug=False)
+#exit()
 '''
-
-
-
-# fig = go.Figure(data=go.Scattergeo(
-#     lon=merged_df['Longitude'],
-#     lat=merged_df['Latitude'],
-#     text=merged_df['Plant Name'],
-#     mode='markers',
-# ))
-# fig.update_layout(height=400,width=600,margin={"r":0,"t":0,"l":0,"b":0})
-
-# fig.show()
-
-
-
-
-
-
-
-
-
-
+t_by_pm_df = pd.DataFrame()
+dff = master_df[['year','Prime Mover','Technology']].groupby('Technology', as_index=False)['Nameplate Capacity (MW)'].sum()
+for year in years:
+    dff = dff.assign(year=year)
+    t_by_pm_df = pd.concat([t_by_pm_df, dff], ignore_index=True)
 
 
 

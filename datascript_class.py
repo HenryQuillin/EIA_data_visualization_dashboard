@@ -77,7 +77,7 @@ if __name__ == 'main':
     pass
 
 d = GetData()
-d.get_data_to_csv(2018,2019, file_type='csv')
+d.get_data(2001,2020)
 
 '''
 plotly_data = pd.read_csv(d.cwd / 'data' / 'df_2018.csv')
