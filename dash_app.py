@@ -20,7 +20,7 @@ for year in years:
     plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude']]
 
     #create generator dataframe
-    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
+    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=300)
     gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
 
     #merge both dataframes on 'plant code' 
@@ -33,6 +33,17 @@ for year in years:
 print('----------LOADED DATAFRAMES----------------')
 print(final_df.head(3))
 
+total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']]
+for x in total_capacity_df['Prime Mover'].unique():
+    total = total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Nameplate Capacity (MW)'].sum()
+    total_capacity_df['Total Capacity'] 
+    print(total)
+
+#total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Total Capacity'] = total
+print(total_capacity_df.head())
+
+
+exit()
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 print('---------------CREATING LAYOUT-------------------')
 # ------------APP LAYOUT------------------------------
@@ -46,6 +57,7 @@ app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col([
+            html.H3("Total Nameplate Capacity by Prime Mover", className='text-center text-primary mb-4'),
             dcc.Dropdown(id='dpdn1', multi=True, value=['WT','IC'], options=[{'label':x, 'value':x}
                                     for x in final_df['Prime Mover'].unique()],
                          ),
@@ -53,7 +65,8 @@ app.layout = dbc.Container([
         ], #width={'size':5, 'offset':0},
         xs=12, sm=12, md=12, lg=5, xl=5),
         dbc.Col([
-            dcc.Dropdown(id='my-dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x}
+            html.H3("Total Nameplate Capacity by Technology", className='text-center text-primary mb-4'),
+            dcc.Dropdown(id='dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x}
                                   for x in sorted(final_df['Technology'].unique())],
                          ),
             dcc.Graph(id='line-fig2', figure={})
@@ -72,10 +85,24 @@ app.layout = dbc.Container([
 ],fluid=True)
 
 print('---------------CREATED LAYOUT-------------------')
+# Updating Line Fig 1 
+@app.callback(
+    [Output('line-fig','figure')],
+    [Input('dpdn1','value')]
+)
+def update_fig1(dpdn_val):
+    dff = final_df[final_df['Prime Mover'].isin(dpdn_val)]
+    line_fig = px.line(dff, x='year', y='Nameplate Capacity (MW)')
+    return [line_fig]
+
+
+
+
 print('---------------RAN SERVER-------------------')
 
 app.run_server(debug=True)
 '''
+
 
 
 # fig = go.Figure(data=go.Scattergeo(
