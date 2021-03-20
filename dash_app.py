@@ -20,7 +20,7 @@ for year in years:
     plant_df = plant_df[['Utility ID','Plant Code', 'Plant Name', 'Latitude', 'Longitude']]
 
     #create generator dataframe
-    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=300)
+    gen_df = pd.read_excel(data + f'/3_1_Generator_Y{year}.xlsx', skiprows=1, nrows=25)
     gen_df = gen_df[['Utility ID','Plant Code', 'Plant Name','Generator ID', 'Technology', 'Prime Mover', 'Operating Year','Nameplate Capacity (MW)']]
 
     #merge both dataframes on 'plant code' 
@@ -31,19 +31,27 @@ for year in years:
     final_df = pd.concat([final_df, merged_df], ignore_index=True)
     print('---------------All years------------------')
 print('----------LOADED DATAFRAMES----------------')
-print(final_df.head(3))
 
-total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']]
-for x in total_capacity_df['Prime Mover'].unique():
-    total = total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Nameplate Capacity (MW)'].sum()
-    total_capacity_df['Total Capacity'] 
-    print(total)
-
-#total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Total Capacity'] = total
-print(total_capacity_df.head())
-
+# Add total capacity of prime movers 
+total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']].groupby('Prime Mover', as_index=False)['Nameplate Capacity (MW)'].sum()
+for year in years:
+    total_capacity_df = total_capacity_df.assign(year=year)
+    total_capacity_df.rename(columns = {'Nameplate Capacity (MW)':'Total Nameplate Capacity'}, inplace = True) 
+print(total_capacity_df)
 
 exit()
+print(final_df.head(3))
+# Create df with total_capacity 
+total_capacity_df = final_df[['year','Prime Mover','Nameplate Capacity (MW)']]
+for x in total_capacity_df['Prime Mover'].unique():
+    print(x)
+    total = total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Nameplate Capacity (MW)'].sum()
+    total_capacity_df = total_capacity_df.assign(TotalCapacity=total)
+#total_capacity_df.loc[total_capacity_df['Prime Mover'] == x, 'Total Capacity'] = total
+#print(total_capacity_df.head(15))
+
+
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 print('---------------CREATING LAYOUT-------------------')
 # ------------APP LAYOUT------------------------------
