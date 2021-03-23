@@ -14,7 +14,7 @@ data = str(Path(os.getcwd()+'/data'))
 
 master_df = pd.DataFrame()
 tc_by_pm_df = pd.DataFrame()
-years = range(2014,2020)
+years = range(2019,2020)
 for year in years:
     #create plant dataframe 
     plant_df = pd.read_excel(data + f'/2___Plant_Y{year}.xlsx', skiprows=1)
@@ -28,9 +28,11 @@ for year in years:
     merged_df = pd.merge(gen_df, plant_df)
     print('-------MERGED DF--------')
     merged_df = merged_df.assign(year=year)
+    # Create Total capcity grouped by Prime Mover Dataframe 
     dff = merged_df[['year','Prime Mover','Nameplate Capacity (MW)']].groupby('Prime Mover', as_index=False)['Nameplate Capacity (MW)'].sum()
     dff = dff.assign(year=year)
     tc_by_pm_df = pd.concat([tc_by_pm_df, dff], ignore_index=True)
+
     master_df = pd.concat([master_df, merged_df], ignore_index=True)
 
 # Create total capacity by prime movers dataframe 
@@ -97,6 +99,40 @@ def update_fig1(dpdn_val):
     dff = tc_by_pm_df[tc_by_pm_df['Prime Mover'].isin(dpdn_val)]
     line_fig = px.line(dff, x='year', y='Total Nameplate Capacity', color='Prime Mover')
     return [line_fig]
+
+# Updating Map 
+@app.callback(
+    [Output('bubble_chart','figure')],
+    [Input('bubble_map_checklist','value')]
+)
+def update_fig1(dpdn_val):
+    dff = master_df[master_df['Prime Mover'].isin(dpdn_val)]
+    fig = go.Figure(data=go.Scattergeo(
+    locationmode = 'USA-states',
+    lon=dff['Longitude'],
+    lat=dff['Latitude'],
+    text=dff['Plant Name'],
+    mode='markers',
+    marker = dict(
+        size = 8,
+        opacity = 0.8,
+        reversescale = True,
+        autocolorscale = False,
+        symbol = 'square',
+        line = dict(
+            width=1,
+            color='rgba(102, 102, 102)'
+        ),
+        colorscale = 'Blues',
+        cmin = 0,
+        #color = master_df['Prime Mover'],
+        #cmax = master_df['cnt'].max(),
+        #colorbar_title="Prime Mover"
+    )))
+
+    return[fig]
+
+
 '''
 @app.callback(
     [Output('line-fig2','figure')],
@@ -122,7 +158,7 @@ def update_fig2(dpdn_val):
 
 print('---------------RAN SERVER-------------------')
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
 #exit()
 '''
 t_by_pm_df = pd.DataFrame()
