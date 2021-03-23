@@ -64,25 +64,25 @@ app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col([
-            html.H3("Total Nameplate Capacity by Prime Mover", className='text-center text-primary mb-4'),
+            html.H3("Total Nameplate Capacity by Prime Mover Line Chart", className='text-center text-primary mb-4'),
             dcc.Dropdown(id='dpdn1', multi=True, value=['WT','CT','CA','HY'], options=[{'label':x, 'value':x} for x in master_df['Prime Mover'].unique()],
                          ),
             dcc.Graph(id='line-fig', figure={})
         ], #width={'size':5, 'offset':0},
         xs=12, sm=12, md=12, lg=5, xl=5),
         dbc.Col([
-            html.H3("Total Nameplate Capacity by Technology", className='text-center text-primary mb-4'),
-            dcc.Dropdown(id='dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x} for x in sorted(master_df['Technology'].unique())],
+            html.H3("Total Nameplate Capacity by Prime Mover bar Chart", className='text-center text-primary mb-4'),
+            dcc.Dropdown(id='dpdn2', multi=True, value='Petroleum Liquids', options=[{'label':x, 'value':x} for x in sorted(master_df['Prime Mover'].unique())],
                          ),
-            dcc.Graph(id='line-fig2', figure={})
+            dcc.Graph(id='bar-chart', figure={})
         ], #width={'size':5, 'offset':0} 
         xs=12, sm=12, md=12, lg=5, xl=5),
     ],justify='around'),
 
     dbc.Row([
         dbc.Col([
-            html.H3('Bubble Map', style={'textDecoration': 'underline'}, className='text-center'), 
-            dcc.Checklist(id='bubble_map_checklist', value=['IC', 'WT', 'HY'], options=[{'label':x,'value':x} for x in sorted(master_df['Prime Mover'].unique())],labelClassName='mr-3'),
+            html.H3('Map of generation units in the United States', style={'textDecoration': 'underline'}, className='text-center'), 
+            dcc.Checklist(id='bubble_map_checklist', value=['HY'], options=[{'label':x,'value':x} for x in sorted(master_df['Prime Mover'].unique())],labelClassName='mr-3'),
             dcc.Graph(id='bubble_chart', figure={})
         ], #width={'size':5, 'offset':0})
         xs=12, sm=12, md=12, lg=10, xl=10),
@@ -99,13 +99,21 @@ def update_fig1(dpdn_val):
     dff = tc_by_pm_df[tc_by_pm_df['Prime Mover'].isin(dpdn_val)]
     line_fig = px.line(dff, x='year', y='Total Nameplate Capacity', color='Prime Mover')
     return [line_fig]
+# @app.callback(
+#     [Output('line-fig','figure')],
+#     [Input('dpdn1','value')]
+# )
+# def update_bar_chart(dpdn_val):
+#     dff = tc_by_pm_df[tc_by_pm_df['Prime Mover'].isin(dpdn_val)]
+#     line_fig = px.bar(dff, x='year', y='Total Nameplate Capacity', color='Prime Mover')
+#     return [line_fig]
 
 # Updating Map 
 @app.callback(
     [Output('bubble_chart','figure')],
     [Input('bubble_map_checklist','value')]
 )
-def update_fig1(dpdn_val):
+def update_map(dpdn_val):
     dff = master_df[master_df['Prime Mover'].isin(dpdn_val)]
     fig = go.Figure(data=go.Scattergeo(
     locationmode = 'USA-states',
@@ -129,13 +137,15 @@ def update_fig1(dpdn_val):
         #cmax = master_df['cnt'].max(),
         #colorbar_title="Prime Mover"
     )))
+    fig.update_layout(geo_scope='usa')
+
 
     return[fig]
 
 
 '''
 @app.callback(
-    [Output('line-fig2','figure')],
+    [Output('bar-chart','figure')],
     [Input('dpdn2','value')]
 )
 def update_fig2(dpdn_val):
