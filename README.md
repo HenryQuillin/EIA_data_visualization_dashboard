@@ -1,5 +1,5 @@
 # Energy Data Visualization Dashboard 
-> Here goes your awesome project description!
+
 
 ## Table of contents
 * [General info](#general-info)
@@ -15,7 +15,9 @@
 This projects was created to show the growth trends in Nameplate Capcity categorized each prime mover. 
 
 ## Screenshots
-![Example screenshot](./img/screenshot.png)
+![Screen Shot 2021-04-05 at 1 06 53 PM](https://user-images.githubusercontent.com/46876350/113608401-2a677b00-9610-11eb-9f6c-dc788f3a45a8.png)
+![Screen Shot 2021-04-05 at 1 09 59 PM](https://user-images.githubusercontent.com/46876350/113608467-3ce1b480-9610-11eb-8982-d2f1abc42ddc.png)
+![Screen Shot 2021-04-05 at 1 10 15 PM](https://user-images.githubusercontent.com/46876350/113608496-4703b300-9610-11eb-8030-83c65453a226.png)
 
 ## Technologies
 * Dash - dash_core_components - dash_html_components - dash_bootstrap_components
