@@ -12,7 +12,7 @@
 * [Contact](#contact)
 
 ## General info
-This projects was created to show the growth trends in Nameplate Capcity categorized each prime mover. 
+Interactive data visualization app for energy/power trading. Displays wind, solar, and other energy data. Created to show the growth trends categorized each prime mover.
 
 ## Screenshots
 ![Screen Shot 2021-04-05 at 1 06 53 PM](https://user-images.githubusercontent.com/46876350/113608401-2a677b00-9610-11eb-9f6c-dc788f3a45a8.png)
