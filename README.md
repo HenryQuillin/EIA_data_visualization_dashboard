@@ -56,7 +56,7 @@ To-do list:
 * Change from using local xlsx files to pulling data from the EIA API 
 
 ## Status
-Project is: _in progress_
+Project is: _finished_
 
 ## Contact
 Created by [@HenryQuillin](henryquillin@gmail.com) - feel free to contact me!
